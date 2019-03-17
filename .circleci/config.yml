@@ -57,6 +57,7 @@ jobs:
             bundle exec htmlproofer ./_site \
               --allow-hash-href \
               --check-html \
+              --check-favicon \
               --disable-external
       - persist_to_workspace:
           root: ./
@@ -66,7 +67,7 @@ jobs:
   deploy:
     <<: *defaults
     docker:
-      - image: circleci/python:3.6.3
+      - image: circleci/ruby:2.5-node-browsers
 
     steps:
       - add_ssh_keys:
@@ -75,15 +76,19 @@ jobs:
       - attach_workspace:
           at: ./
       - run:
-          name: Install rsync
-          command: sudo apt install rsync
+          name: Install rsync and dnsutils
+          command: sudo apt install rsync dnsutils
+      - run:
+          name: Add remote to known_hosts
+          command: |
+            for ip in $(dig @8.8.8.8 mipixel.com +short); do ssh-keyscan -H mipixel.com,$ip; ssh-keyscan -H $ip; done 2>/dev/null | install -D /dev/stdin ~/.ssh/known_hosts
       - run:
           name: Add remote to known_hosts
           command: |
             for ip in $(dig @8.8.8.8 mipixel.com +short); do ssh-keyscan mipixel.com,$ip; ssh-keyscan $ip; done 2>/dev/null | install -D /dev/stdin ~/.ssh/known_hosts
       - run:
           name: Upload to mipixel.com
-          command: rsync -av ./_site mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
+          command: rsync -av ./_site/ mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
 
 workflows:
   version: 2
