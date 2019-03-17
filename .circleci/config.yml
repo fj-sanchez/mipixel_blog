@@ -2,12 +2,16 @@
 #
 # Check https://circleci.com/docs/2.0/language-ruby/ for more details
 #
+
+defaults: &defaults
+  working_directory: ~/repo
+
 version: 2
 jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.4.1-node-browsers
+      - image: circleci/ruby:2.5-node-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -20,6 +24,14 @@ jobs:
       - checkout
 
       # Download and cache dependencies
+
+      - run:
+          name: Configure Bundler
+          command: |
+            echo 'export BUNDLER_VERSION=$(cat Gemfile.lock | tail -1 | tr -d " ")' >> $BASH_ENV
+            source $BASH_ENV
+            gem install bundler
+
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "Gemfile.lock" }}
@@ -27,7 +39,7 @@ jobs:
             - v1-dependencies-
 
       - run:
-          name: install dependencies
+          name: Install dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
@@ -44,7 +56,6 @@ jobs:
           command: |
             bundle exec htmlproofer ./_site \
               --allow-hash-href \
-              --check-favicon  \
               --check-html \
               --disable-external
       - persist_to_workspace:
@@ -56,17 +67,20 @@ jobs:
     <<: *defaults
     docker:
       - image: circleci/python:3.6.3
-    environment:
-      S3_BUCKET_NAME: <<YOUR BUCKET NAME HERE>>
+
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "99:51:d6:5d:25:50:54:45:c5:7d:98:cc:50:62:3d:b6"           
       - attach_workspace:
           at: ./
       - run:
-          name: Install AWS CLI
-          command: pip install awscli --upgrade --user
+          name: Install rsync
+          command: apt install rsync
       - run:
-          name: Upload to s3
-          command: ~/.local/bin/aws s3 sync ./_site s3://$S3_BUCKET_NAME/ --delete --acl public-read
+          name: Upload to mipixel.com
+          command: rsync -av ./_site mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
+
 workflows:
   version: 2
   test-deploy:
@@ -77,4 +91,4 @@ workflows:
             - build
           filters:
             branches:
-              only: master   
+              only: master
