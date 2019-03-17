@@ -24,6 +24,7 @@ jobs:
       - checkout
 
       # Download and cache dependencies
+
       - run:
           name: Configure Bundler
           command: |
@@ -38,7 +39,7 @@ jobs:
             - v1-dependencies-
 
       - run:
-          name: install dependencies
+          name: Install dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
@@ -66,6 +67,7 @@ jobs:
     <<: *defaults
     docker:
       - image: circleci/python:3.6.3
+
     steps:
       - add_ssh_keys:
           fingerprints:
