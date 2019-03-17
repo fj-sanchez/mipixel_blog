@@ -11,7 +11,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.4.1-node-browsers
+      - image: circleci/ruby:2.5.5-node-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -56,8 +56,31 @@ jobs:
           paths:
             - _site
 
+  deploy:
+    <<: *defaults
+    docker:
+      - image: circleci/python:3.6.3
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "99:51:d6:5d:25:50:54:45:c5:7d:98:cc:50:62:3d:b6"           
+      - attach_workspace:
+          at: ./
+      - run:
+          name: Install rsync
+          command: apt install rsync
+      - run:
+          name: Upload to mipixel.com
+          command: rsync -av ./_site mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
+
 workflows:
   version: 2
   test-deploy:
     jobs:
       - build
+      - deploy
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
