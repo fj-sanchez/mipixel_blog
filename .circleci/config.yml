@@ -78,6 +78,10 @@ jobs:
           name: Install rsync
           command: sudo apt install rsync
       - run:
+          name: Add remote to known_hosts
+          command: |
+            for ip in $(dig @8.8.8.8 mipixel.com +short); do ssh-keyscan mipixel.com,$ip; ssh-keyscan $ip; done 2>/dev/null | install -D /dev/stdin ~/.ssh/known_hosts
+      - run:
           name: Upload to mipixel.com
           command: rsync -av ./_site mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
 
