@@ -76,7 +76,7 @@ jobs:
           at: ./
       - run:
           name: Install rsync
-          command: apt install rsync
+          command: sudo apt install rsync
       - run:
           name: Upload to mipixel.com
           command: rsync -av ./_site mipixel@mipixel.com:~/public_html/  --delete --exclude '.htaccess' --exclude '.well-known'
