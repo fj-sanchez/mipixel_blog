@@ -11,7 +11,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/ruby:2.5.5-node-browsers
+      - image: circleci/ruby:2.5-node-browsers
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -24,6 +24,13 @@ jobs:
       - checkout
 
       # Download and cache dependencies
+      - run:
+          name: Configure Bundler
+          command: |
+            echo 'export BUNDLER_VERSION=$(cat Gemfile.lock | tail -1 | tr -d " ")' >> $BASH_ENV
+            source $BASH_ENV
+            gem install bundler
+
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "Gemfile.lock" }}
@@ -48,7 +55,6 @@ jobs:
           command: |
             bundle exec htmlproofer ./_site \
               --allow-hash-href \
-              --check-favicon  \
               --check-html \
               --disable-external
       - persist_to_workspace:
@@ -78,7 +84,7 @@ workflows:
   test-deploy:
     jobs:
       - build
-      - deploy
+      - deploy:
           requires:
             - build
           filters:
