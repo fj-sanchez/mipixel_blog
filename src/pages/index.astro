@@ -2,6 +2,7 @@
 import Layout from "../components/layout.astro";
 import PostListing from "../components/post/post-list.astro";
 import { posts } from "../helpers";
+import  SpeedInsights  from "@vercel/speed-insights/astro"
 ---
-
+<SpeedInsights/>
 <Layout><PostListing posts={posts} /></Layout>
