@@ -1,8 +1,7 @@
-export const SITE_FAVICON = "/favicon.png";
-export const SITE_LOGO = "/avatar.png";
-export const SITE_TITLE = "Mia";
-export const SITE_DESCRIPTION =
-  "Mia is designed to be minimalist yet powerful, integrating the capabilities of Astro, MDX, and Rough Notation. Whether you're a developer, writer, or just someone who loves clean and efficient design, this theme is perfect for you.";
+// export const SITE_FAVICON = "/favicon-96x96.png";
+export const SITE_LOGO = "/logo.png";
+export const SITE_TITLE = "Mi Pixel - Fran Sanchez";
+export const SITE_DESCRIPTION = "Personal blog from Fran Sanchez.";
 
 export const MENUS = [
   {
@@ -20,13 +19,8 @@ export const MENUS = [
     link: "/date",
     target: "_self",
   },
-  {
-    title: "GitHub",
-    link: "https://github.com/infinity-ooo/astro-theme-mia",
-    target: "_blank",
-  },
 ];
 
-export const FOOTER_CONTENT = "Let's build a 1B unicorn 🦄";
+export const FOOTER_CONTENT = "";
 
 export const GOOGLE_GTAG = "G-XXXXXXXXXX";
